@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Viewer - AR360.io</title>
+    <style>
+        html:not(.ready) [type=reset], html:not(.ready) [type=submit] {
+            pointer-events: none;
+        }
+
+        html:not(.ready) * {
+            transition: none!important;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Open Sans, sans-serif;
+        }
+
+        .viewer {
+            width: 100%;
+            height: 100%;
+        }
+
+/* Styling für das Logo */
+.logo {
+    position: fixed;
+    bottom: 23px;
+    left: 23px; /* Auf der linken Seite */
+    width: 200px; /* Standardgröße */
+    height: auto;
+    z-index: 100;
+}
+
+/* Für kleinere Geräte (z.B. Smartphones) */
+@media (max-width: 768px) {
+    .logo {
+        width: 110px; /* Kleinere Größe auf Handys */
+    }
+}
+
+
+        
+        /* Entfernen der Fortschrittsanzeige */
+        .loading-container {
+            display: none;
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://ar360.io/css/ar360.css" />
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body>
+
+<model-viewer
+    class="viewer"
+    style="width:100%; height:100%"
+    src="GNR2_MockUp.glb"
+    enable-pan
+    min-field-of-view="1deg"
+    max-field-of-view="150deg"
+    interaction-prompt="none"
+    camera-controls
+    oncontextmenu="return false;"
+    alt="A 3D model"
+>
+</model-viewer>
+
+<!-- Logo unten rechts -->
+<img src="logo.png" alt="Logo" class="logo">
+
+<script>
+    const modelViewer = document.querySelector("model-viewer");
+    const progressBar = document.querySelector('.main-progress-display__progress');
+    const animationPlay = document.querySelector(".animation-play");
+    const animationRewind = document.querySelector(".animation-rewind");
+
+    let loading = true;
+
+    const onProgress = (event) => {
+        if (loading) {
+            progressBar.style.width = `${event.detail.totalProgress * 100}%`;
+            if (event.detail.totalProgress === 1) {
+                loading = false;
+                modelViewer.classList.add('model-loaded');
+                document.documentElement.classList.add('ready');
+            }
+        }
+    };
+
+    modelViewer.addEventListener('progress', onProgress);
+
+    if (animationPlay) {
+        animationPlay.addEventListener('click', function () {
+            if (modelViewer.paused) {
+                modelViewer.play();
+                console.log('play');
+            } else {
+                modelViewer.pause();
+                console.log('pause');
+            }
+        });
+    }
+
+    if (animationRewind) {
+        animationRewind.addEventListener('click', function () {
+            let time = modelViewer.currentTime;
+            console.log(time);
+            if (time < 5) {
+                time = 0;
+            } else {
+                time = time - 5;
+            }
+            modelViewer.currentTime = time;
+            console.log('rewind 5');
+        });
+    }
+</script>
+
+</body>
+</html>
